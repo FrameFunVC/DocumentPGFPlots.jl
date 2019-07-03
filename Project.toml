@@ -1,0 +1,7 @@
+name = "DocumentPGFPlots"
+uuid = "7bd7de4a-9dc3-11e9-2e0f-c97135212476"
+authors = ["vincentcp"]
+version = "0.1.0"
+
+[deps]
+PGFPlotsX = "8314cec4-20b6-5062-9cdb-752b83310925"
