@@ -9,7 +9,9 @@ try;rm("test.tex");catch end
 try;rm("test.tikz");catch end
 
 @testset "natural" begin
+    run(`ls`)
     DocumentPGFPlots.savefigs("test",P)
+    run(`ls`)
     @test Base.isfile("test.pdf")
     @test Base.isfile("test.svg")
     @test Base.isfile("test.tex")
@@ -23,7 +25,9 @@ end
 if !(Base.Sys.which("docker")===nothing)
     @testset "docker" begin
         push!(ARGS,"docker")
+        run(`ls`)
         DocumentPGFPlots.savefigs("test",P)
+        run(`ls`)
         @test Base.isfile("test.pdf")
         @test Base.isfile("test.svg")
         @test Base.isfile("test.tex")
@@ -38,7 +42,9 @@ end
 if !(Base.Sys.which("latexmk")===nothing&&Base.Sys.which("pdf2svg")===nothing)
     @testset "native" begin
         push!(ARGS,"native")
+        run(`ls`)
         DocumentPGFPlots.savefigs("test",P)
+        run(`ls`)
         @test Base.isfile("test.pdf")
         @test Base.isfile("test.svg")
         @test Base.isfile("test.tex")
