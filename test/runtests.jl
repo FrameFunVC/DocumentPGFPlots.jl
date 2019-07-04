@@ -8,30 +8,41 @@ try;rm("test.svg");catch end
 try;rm("test.tex");catch end
 try;rm("test.tikz");catch end
 
-DocumentPGFPlots.savefigs("test",P)
-@test Base.isfile("test.pdf")
-@test Base.isfile("test.svg")
-@test Base.isfile("test.tex")
-@test Base.isfile("test.tikz")
-try;rm("test.pdf");catch end
-try;rm("test.svg");catch end
-try;rm("test.tex");catch end
-try;rm("test.tikz");catch end
-push!(ARGS,"docker")
-DocumentPGFPlots.savefigs("test",P)
-@test Base.isfile("test.pdf")
-@test Base.isfile("test.svg")
-@test Base.isfile("test.tex")
-@test Base.isfile("test.tikz")
-try;rm("test.pdf");catch end
-try;rm("test.svg");catch end
-try;rm("test.tex");catch end
-try;rm("test.tikz");catch end
-pop!(ARGS)
-push!(ARGS,"native")
-DocumentPGFPlots.savefigs("test",P)
-@test Base.isfile("test.pdf")
-@test Base.isfile("test.svg")
-@test Base.isfile("test.tex")
-@test Base.isfile("test.tikz")
-pop!(ARGS)
+@testset "natural" begin
+    DocumentPGFPlots.savefigs("test",P)
+    @test Base.isfile("test.pdf")
+    @test Base.isfile("test.svg")
+    @test Base.isfile("test.tex")
+    @test Base.isfile("test.tikz")
+    try;rm("test.pdf");catch end
+    try;rm("test.svg");catch end
+    try;rm("test.tex");catch end
+    try;rm("test.tikz");catch end
+end
+
+if !(Base.Sys.which("docker")===nothing)
+    @testset "docker" begin
+        push!(ARGS,"docker")
+        DocumentPGFPlots.savefigs("test",P)
+        @test Base.isfile("test.pdf")
+        @test Base.isfile("test.svg")
+        @test Base.isfile("test.tex")
+        @test Base.isfile("test.tikz")
+        try;rm("test.pdf");catch end
+        try;rm("test.svg");catch end
+        try;rm("test.tex");catch end
+        try;rm("test.tikz");catch end
+        pop!(ARGS)
+    end
+end
+if !(Base.Sys.which("latexmk")===nothing&&Base.Sys.which("pdf2svg")===nothing)
+    @testset "native" begin
+        push!(ARGS,"native")
+        DocumentPGFPlots.savefigs("test",P)
+        @test Base.isfile("test.pdf")
+        @test Base.isfile("test.svg")
+        @test Base.isfile("test.tex")
+        @test Base.isfile("test.tikz")
+        pop!(ARGS)
+    end
+end
