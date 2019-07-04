@@ -1,0 +1,18 @@
+language: julia
+os:
+  - linux
+  - osx
+julia:
+  - 1.1
+  - nightly
+services: docker
+sudo: true
+matrix:
+    allow_failures:
+        - julia: nightly
+notifications:
+  email: false
+
+before_script:
+  - julia --color=yes -e 'using Pkg;Pkg.Registry.add(RegistrySpec(url="https://github.com/vincentcp/FrameFunRegistry"));'
+  - julia --color=yes -e 'using Pkg;Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"));'

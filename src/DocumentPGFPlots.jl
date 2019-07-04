@@ -2,18 +2,18 @@ module DocumentPGFPlots
 
 using PGFPlotsX
 
-savefigs = (figname, obj) -> begin
-    pgfsave(figname * ".tex", obj);
-    pgfsave(figname * ".tikz", obj;include_preamble=false);
+function savefigs(filename, obj)
+    pgfsave(filename * ".tex", obj);
+    pgfsave(filename * ".tikz", obj;include_preamble=false);
     if "docker" in ARGS
-        compile_tex(figname * ".tex", "docker")
-        pdf2svg(figname, "docker")
+        compile_tex(filename * ".tex", "docker")
+        pdf2svg(filename, "docker")
     elseif "native" in ARGS
-        compile_tex(figname * ".tex", "native")
-        pdf2svg(figname, "native")
+        compile_tex(filename * ".tex", "native")
+        pdf2svg(filename, "native")
     else
-        compile_tex(figname * ".tex")
-        pdf2svg(figname)
+        compile_tex(filename * ".tex")
+        pdf2svg(filename)
     end
     return nothing
 end
@@ -30,7 +30,7 @@ function compile_tex(texfile::String, platform = (Sys.which("latexmk") === nothi
         Sys.which("latexmk") === nothing && (@error "LaTeXWriter: latexmk command not found."; return false)
         @info "LaTeXWriter: using latexmk to compile tex."
         try
-            p = splitdir(figname)[1]=="" ? pwd() : splitdir(figname)[1]
+            p = splitdir(texfile)[1]=="" ? pwd() : splitdir(texfile)[1]
             cd(p)
             piperun(`latexmk -f -interaction=nonstopmode -view=none -lualatex -shell-escape $(Base.basename(texfile))`)
             return true
@@ -49,7 +49,7 @@ function compile_tex(texfile::String, platform = (Sys.which("latexmk") === nothi
             latexmk -f -interaction=nonstopmode -view=none -lualatex -shell-escape $(Base.basename(texfile))
         """
         try
-            p = splitdir(figname)[1]=="" ? pwd() : splitdir(figname)[1]
+            p = splitdir(texfile)[1]=="" ? pwd() : splitdir(texfile)[1]
             piperun(`docker run -itd -u zeptodoctor --name latex-container -v $(p):/mnt/ --rm juliadocs/documenter-latex:0.1`)
             piperun(`docker exec -u zeptodoctor latex-container bash -c $(script)`)
             piperun(`docker cp latex-container:/home/zeptodoctor/build/. $(p)`)
