@@ -2,18 +2,22 @@ module DocumentPGFPlots
 
 using PGFPlotsX
 
-function savefigs(filename, obj)
-    pgfsave(filename * ".tex", obj);
-    pgfsave(filename * ".tikz", obj;include_preamble=false);
-    if "docker" in ARGS
-        compile_tex(filename * ".tex", "docker")
-        pdf2svg(filename, "docker")
-    elseif "native" in ARGS
-        compile_tex(filename * ".tex", "native")
-        pdf2svg(filename, "native")
-    else
-        compile_tex(filename * ".tex")
-        pdf2svg(filename)
+function savefigs(filename, obj; all=true, render=true)
+    if render
+        pgfsave(filename * ".tex", obj);
+        pgfsave(filename * ".tikz", obj;include_preamble=false);
+    end
+    if all
+        if "docker" in ARGS
+            compile_tex(filename * ".tex", "docker")
+            pdf2svg(filename, "docker")
+        elseif "native" in ARGS
+            compile_tex(filename * ".tex", "native")
+            pdf2svg(filename, "native")
+        else
+            compile_tex(filename * ".tex")
+            pdf2svg(filename)
+        end
     end
     return nothing
 end
@@ -82,7 +86,7 @@ function pdf2svg(figname::String, platform = (Sys.which("pdf2svg") === nothing )
         @info "using docker to create svg."
         try
             p = splitdir(figname)[1]=="" ? pwd() : splitdir(figname)[1]
-            piperun(`docker run -itd --name svg-container -v $(p):/mnt/  --rm vincentcoppe/pdf2svg pdf2svg /mnt/$(Base.basename(figname)).pdf /mnt/$(Base.basename(figname)).svg`)
+            piperun(`docker run -itd  -v $(p):/mnt/  --rm vincentcoppe/pdf2svg pdf2svg /mnt/$(Base.basename(figname)).pdf /mnt/$(Base.basename(figname)).svg`)
             return true
         catch err
             @error "failed to create svg with docker."
