@@ -8,9 +8,6 @@ jobs:
   CompatHelper:
     runs-on: ubuntu-latest
     steps:
-      - name: 
-        run: 
-
       - name: Pkg.add("CompatHelper")
         run: julia -e 'using Pkg; Pkg.add("CompatHelper")'
       - name: CompatHelper.main()
